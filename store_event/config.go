@@ -1,7 +1,6 @@
-package common
+package store_event
 
-// CommandInfo Command层的数据接收结构
-type CommandInfo struct {
+type StoreEventInfo struct {
 	CommandID  string            // CommandID - CommandID指令
 	MutationID string            // MutationID - MutationID指令
 	Event      string            // Event - 修改数据 - 序列化成JSON字符串的结构

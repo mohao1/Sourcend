@@ -3,6 +3,7 @@ package command
 import (
 	"Sourcend/common"
 	"Sourcend/mutation"
+	"Sourcend/store_event"
 	"context"
 	"errors"
 	"fmt"
@@ -102,7 +103,7 @@ func (m *Manager) executeCommand(ctx context.Context, data common.CommandInfo) (
 	return newData, nil
 }
 
-func (m *Manager) Execute(ctx context.Context, info common.CommandInfo, storeEvents []StoreEvent, beforeMutations []*mutation.Manager, afterMutations []*mutation.Manager) error {
+func (m *Manager) Execute(ctx context.Context, info common.CommandInfo, storeEvents []store_event.StoreEvent, beforeMutations []*mutation.Manager, afterMutations []*mutation.Manager) error {
 
 	// 执行Command
 	commandInfo, err := m.executeCommand(ctx, info)
@@ -159,9 +160,15 @@ func (m *Manager) afterMutation(ctx context.Context, info common.CommandInfo, ma
 	return nil
 }
 
-func (m *Manager) storeEvent(ctx context.Context, info common.CommandInfo, storeEvents []StoreEvent) {
+func (m *Manager) storeEvent(ctx context.Context, info common.CommandInfo, storeEvents []store_event.StoreEvent) {
+	data := store_event.StoreEventInfo{
+		CommandID:  info.CommandID,
+		MutationID: info.MutationID,
+		Event:      info.Event,
+		Params:     info.Params,
+	}
 	for _, storeEvent := range storeEvents {
-		err := storeEvent.Handler(ctx, info)
+		err := storeEvent.Handler(ctx, data)
 		if err != nil {
 			fmt.Println("store err:", err)
 			continue

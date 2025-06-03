@@ -1,16 +1,9 @@
 package action
 
-import (
-	"Sourcend/command"
-	"Sourcend/mutation"
-)
-
 // Event 发生事件信息存储
 type Event struct {
-	CommandID      string                  // CommandID - CommandID指令
-	MutationID     string                  // MutationID - MutationID指令
-	Event          string                  // Event - 修改数据 - 序列化成JSON字符串的结构
-	Params         map[string]string       // Params - 其他扩展数据
-	CommandConfig  command.CommandConfig   // Command配置文件
-	MutationConfig mutation.MutationConfig // Mutation配置文件
+	CommandID  string            // CommandID - CommandID指令
+	MutationID string            // MutationID - MutationID指令
+	Event      string            // Event - 修改数据 - 序列化成JSON字符串的结构
+	Params     map[string]string // Params - 其他扩展数据
 }

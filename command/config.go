@@ -17,6 +17,6 @@ type CommandData struct {
 
 // ManagerConfig CommandManager的配置文件的存储
 type ManagerConfig struct {
-	ManagerName       string
-	MutationConfigMap map[string]CommandConfig
+	ManagerName      string
+	CommandConfigMap map[string]CommandConfig
 }

@@ -6,5 +6,4 @@ type CommandInfo struct {
 	MutationID string            // MutationID - MutationID指令
 	Event      string            // Event - Command携带的数据 - 序列化成JSON字符串的结构
 	Params     map[string]string // Params - 其他扩展数据
-	Config     CommandConfig     // 配置文件
 }

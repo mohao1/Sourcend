@@ -24,5 +24,5 @@ type Interface interface {
 	//Register 注册Mutation指令
 	Register(string, HandlerInterface, ...Middleware) error
 	// Execute 执行Execute
-	Execute(context.Context, common.MutationInfo) (*common.MutationInfo, error)
+	Execute(context.Context, common.MutationInfo) error
 }

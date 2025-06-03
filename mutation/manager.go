@@ -80,7 +80,7 @@ func (m *Manager) Register(mutationID string, handler HandlerInterface, middlewa
 }
 
 // Execute 执行
-func (m *Manager) Execute(ctx context.Context, data common.MutationInfo) (*common.MutationInfo, error) {
+func (m *Manager) Execute(ctx context.Context, data common.MutationInfo) error {
 	mutationID := data.MutationID
 	mutationHandler := m.handlerManager[mutationID]
 
@@ -96,14 +96,8 @@ func (m *Manager) Execute(ctx context.Context, data common.MutationInfo) (*commo
 	// 执行函数
 	err, mutationData := mutationHandler(ctx, mutationData)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	// 转换数据 Data=>Info
-	newData := &common.MutationInfo{
-		MutationID: mutationData.MutationID,
-		Event:      mutationData.Event,
-		Params:     mutationData.Params,
-	}
-	return newData, nil
+	return nil
 }

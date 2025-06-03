@@ -2,6 +2,7 @@ package command
 
 import (
 	"Sourcend/common"
+	"Sourcend/mutation"
 	"context"
 )
 
@@ -16,10 +17,11 @@ type HandlerInterface interface {
 }
 
 type StoreEvent interface {
-	Handler(ctx context.Context, data CommandData) error
+	Handler(ctx context.Context, data common.CommandInfo) error
 }
 
 // Interface Manager接口
+// executeCommand => beforeMutation => storeEvent => afterMutation
 type Interface interface {
 	// Use 注册Command的中间件,全局的执行
 	Use(...Middleware) error
@@ -29,14 +31,15 @@ type Interface interface {
 	Register(string, HandlerInterface, ...Middleware) error
 
 	// 执行Command的Execute操作
-	executeCommand(context.Context, CommandData) (CommandData, error)
-
-	// 设置存储Event的记录信息
-	storeEvent(context.Context, CommandData) error
-
-	// UseStoreEvent 配置存储Event的自定义的操作
-	UseStoreEvent(StoreEvent) error
-
+	executeCommand(context.Context, common.CommandInfo) (*common.CommandInfo, error)
 	// Execute 对外执行Execute
-	Execute(context.Context, common.CommandInfo) (*common.CommandInfo, error)
+	Execute(context.Context, common.CommandInfo, []StoreEvent, []*mutation.Manager, []*mutation.Manager) error
+
+	// StoreEvent之前执行
+	beforeMutation(context.Context, common.CommandInfo, []*mutation.Manager) error
+	// StoreEvent之后执行
+	afterMutation(context.Context, common.CommandInfo, []*mutation.Manager) error
+
+	// 存储Event的记录信息操作
+	storeEvent(context.Context, common.CommandInfo, []StoreEvent)
 }

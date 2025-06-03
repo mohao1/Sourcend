@@ -1,6 +1,8 @@
-package command
+package action
 
-import "errors"
+import (
+	"errors"
+)
 
 // Action action的根数据 - 保存数据结构
 type Action struct {

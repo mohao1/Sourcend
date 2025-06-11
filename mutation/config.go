@@ -2,8 +2,8 @@ package mutation
 
 // MutationConfig 各个Mutation配置
 type MutationConfig struct {
-	CommandID string
-	Params    map[string]string // Params - 扩展数据
+	MutationId string
+	Params     map[string]string // Params - 扩展数据
 }
 
 // MutationData Mutation层接收的数据

@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-// Manager Mutation的管理器
+// Manager Command的管理器
 type Manager struct {
 	ManagerName            string                  // 管理器的名称
 	ManagerConfig          ManagerConfig           // 管理器的配置文件

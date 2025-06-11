@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// MySQLStore MYSQL的StoreEvent的实现
 type MySQLStore struct {
 }
 

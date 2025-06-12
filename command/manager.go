@@ -21,8 +21,14 @@ type Manager struct {
 	handlerManager         map[string]Handler      // Handler存储
 }
 
-func NewManager() *Manager {
-	return &Manager{}
+func NewManager(config ManagerConfig) *Manager {
+	return &Manager{
+		ManagerName:        config.ManagerName,
+		ManagerConfig:      config,
+		middlewares:        make([]Middleware, 0),
+		handlerMiddlewares: make(map[string][]Middleware),
+		handlerManager:     make(map[string]Handler),
+	}
 }
 
 func (m *Manager) Use(middlewares ...Middleware) error {

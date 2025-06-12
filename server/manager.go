@@ -7,6 +7,7 @@ import (
 	"Sourcend/store_event"
 	"context"
 	"errors"
+	"fmt"
 )
 
 type SourcendInfo struct {
@@ -49,6 +50,16 @@ func (s *sourcendManager) RegisterCommand(commandManager *command.Manager) error
 	return nil
 }
 
+// CommandUse 注册Command的中间件
+func (s *sourcendManager) CommandUse(middlewares ...command.Middleware) error {
+	err := s.commandManager.Use(middlewares...)
+	if err != nil {
+		fmt.Println("commandManager Use err:", err)
+		return err
+	}
+	return nil
+}
+
 // RegisterStoreEvent 注册StoreEvent
 func (s *sourcendManager) RegisterStoreEvent(storeEvent store_event.StoreEvent) error {
 	s.storeEvents = append(s.storeEvents, storeEvent)
@@ -70,5 +81,73 @@ func (s *sourcendManager) RegisterBeforeMutations(mutationManager *mutation.Mana
 		return errors.New("beforeMutationManager is nil")
 	}
 	s.beforeMutations = append(s.beforeMutations, mutationManager)
+	return nil
+}
+
+// AfterMutationUse 注册AfterMutation的中间件
+func (s *sourcendManager) AfterMutationUse(mutationName string, middlewares ...mutation.Middleware) error {
+	for _, m := range s.afterMutations {
+		if m.ManagerName == mutationName {
+			err := m.Use(middlewares...)
+			if err != nil {
+				fmt.Println("AfterMutation Use err:", err)
+				return err
+			}
+			return nil
+		}
+	}
+	return errors.New(fmt.Sprintf("mutation %s not found in after mutations", mutationName))
+}
+
+// BeforeMutationUse 注册BeforeMutation的中间件
+func (s *sourcendManager) BeforeMutationUse(mutationName string, middlewares ...mutation.Middleware) error {
+	for _, m := range s.beforeMutations {
+		if m.ManagerName == mutationName {
+			err := m.Use(middlewares...)
+			if err != nil {
+				fmt.Println("BeforeMutation Use err:", err)
+				return err
+			}
+			return nil
+		}
+	}
+	return errors.New(fmt.Sprintf("mutation %s not found in after mutations", mutationName))
+}
+
+// RegisterAfterMutationHandler 往AfterMutation中注入Handler的方法
+func (s *sourcendManager) RegisterAfterMutationHandler(mutationName string, mutationID string, handler mutation.HandlerInterface, middlewares ...mutation.Middleware) error {
+	for _, m := range s.afterMutations {
+		if m.ManagerName == mutationName {
+			err := m.Register(mutationID, handler, middlewares...)
+			if err != nil {
+				fmt.Println("AfterMutation Register err:", err)
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// RegisterBeforeMutationHandler 往BeforeMutation中注入Handler的方法
+func (s *sourcendManager) RegisterBeforeMutationHandler(mutationName string, mutationID string, handler mutation.HandlerInterface, middlewares ...mutation.Middleware) error {
+	for _, m := range s.beforeMutations {
+		if m.ManagerName == mutationName {
+			err := m.Register(mutationID, handler, middlewares...)
+			if err != nil {
+				fmt.Println("BeforeMutation Register err:", err)
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// RegisterCommandHandler 往Command中注入Handler方法
+func (s *sourcendManager) RegisterCommandHandler(commandID string, handler command.HandlerInterface, middlewares ...command.Middleware) error {
+	err := s.commandManager.Register(commandID, handler, middlewares...)
+	if err != nil {
+		fmt.Println("Command Register err:", err)
+		return err
+	}
 	return nil
 }

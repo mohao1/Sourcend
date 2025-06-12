@@ -37,3 +37,14 @@ type MutationHandlerConfig struct {
 	MutationId string            `yaml:"MutationId"`
 	Params     map[string]string `yaml:"Params"` // Params - 扩展数据
 }
+
+// 解析Mutation配置文件夹的函数
+func mutationConfigYamlDir(dir string) ([]MutationConfig, []MutationConfig, error) {
+	return nil, nil, nil
+}
+
+// 解析Command配置文件的函数
+func commandConfigYamlDir(path string) (CommandConfig, error) {
+
+	return CommandConfig{}, nil
+}

@@ -20,15 +20,15 @@ type SourcendServer struct {
 }
 
 // NewDefaultSourcend 根据配置文件生成SourcendServer
-func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) *SourcendServer {
+func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServer, error) {
 	// 解析Yaml
 	after, before, err := mutationConfigYamlDir(mutationYamlDir)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	commandConfig, err := commandConfigYamlDir(commandYamlPath)
+	commandConfig, err := commandConfigYamlPath(commandYamlPath)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	// 存储数据结构
@@ -121,10 +121,10 @@ func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) *SourcendServer
 			beforeMutations: beforeMutations,
 			storeEvents:     storeEvents,
 		},
-		commandConfig:   commandConfig,
+		commandConfig:   *commandConfig,
 		afterMutations:  after,
 		beforeMutations: before,
-	}
+	}, nil
 }
 
 // CommandUse Command注册对应的拦截器

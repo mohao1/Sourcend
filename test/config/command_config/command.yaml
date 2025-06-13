@@ -1,0 +1,5 @@
+CommandName: "COMMAND"
+AfterMutation:
+  - "afterMutation"
+BeforeMutation:
+  - "beforeMutation"

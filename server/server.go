@@ -24,8 +24,10 @@ func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServe
 	// 解析Yaml
 	after, before, err := mutationConfigYamlDir(mutationYamlDir)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
+
 	commandConfig, err := commandConfigYamlPath(commandYamlPath)
 	if err != nil {
 		return nil, err
@@ -102,6 +104,9 @@ func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServe
 	// 生成StoreEvent的操作
 	go func() {
 		defer group.Done()
+		if commandConfig.StoreEvents == nil {
+			return
+		}
 		storeEventList := commandConfig.StoreEvents
 		for _, store := range storeEventList {
 			switch store {

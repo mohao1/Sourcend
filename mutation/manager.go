@@ -4,6 +4,7 @@ import (
 	"Sourcend/common"
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -40,17 +41,17 @@ func (m *Manager) Use(middlewares ...Middleware) error {
 func (m *Manager) apply(mutationID string, handler Handler) (Handler, error) {
 	m.middlewaresLock.Lock()
 	defer m.middlewaresLock.Unlock()
-	m.middlewaresLock.Lock()
-	defer m.middlewaresLock.Unlock()
+	m.handlerMiddlewaresLock.Lock()
+	defer m.handlerMiddlewaresLock.Unlock()
 
 	if middlewares, ok := m.handlerMiddlewares[mutationID]; ok {
-		for i := len(middlewares); i >= 0; i-- {
+		for i := len(middlewares) - 1; i >= 0; i-- {
 			middleware := middlewares[i]
 			handler = middleware(handler)
 		}
 	}
 
-	for i := len(m.middlewares); i >= 0; i-- {
+	for i := len(m.middlewares) - 1; i >= 0; i-- {
 		middleware := m.middlewares[i]
 		handler = middleware(handler)
 	}
@@ -64,9 +65,9 @@ func (m *Manager) Register(mutationID string, handler HandlerInterface, middlewa
 		return errors.New("mutationID must not be empty")
 	}
 	if len(middlewares) > 0 {
-		m.middlewaresLock.Lock()
+		m.handlerMiddlewaresLock.Lock()
 		m.handlerMiddlewares[mutationID] = middlewares
-		m.middlewaresLock.Unlock()
+		m.handlerMiddlewaresLock.Unlock()
 	}
 	// 加载handler的中间件
 	apply, err := m.apply(mutationID, handler.Handler)
@@ -82,7 +83,11 @@ func (m *Manager) Register(mutationID string, handler HandlerInterface, middlewa
 // Execute 执行
 func (m *Manager) Execute(ctx context.Context, data common.MutationInfo) error {
 	mutationID := data.MutationID
-	mutationHandler := m.handlerManager[mutationID]
+	mutationHandler, ok := m.handlerManager[mutationID]
+
+	if !ok {
+		return errors.New(fmt.Sprintf("mutation handler not found: %s", mutationID))
+	}
 
 	// 转换数据 Info=>Data
 	config := m.ManagerConfig.MutationConfigMap[data.MutationID]

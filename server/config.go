@@ -140,6 +140,11 @@ func mutationConfigYamlDir(dir string) ([]MutationConfig, []MutationConfig, erro
 			continue
 		}
 
+		// 初始化成长度为0列表
+		if config.MutationHandlerConfigs == nil {
+			config.MutationHandlerConfigs = make([]MutationHandlerConfig, 0)
+		}
+
 		// 加载数据进入列表
 		switch config.MutationType {
 		case After:
@@ -161,5 +166,21 @@ func commandConfigYamlPath(path string) (*CommandConfig, error) {
 		fmt.Printf("警告: %v\n", err)
 		return nil, err
 	}
+	if config.CommandHandlerConfigs == nil {
+		config.CommandHandlerConfigs = make([]CommandHandlerConfig, 0)
+	}
+
+	if config.StoreEvents == nil {
+		config.StoreEvents = make([]string, 0)
+	}
+
+	if config.AfterMutation == nil {
+		config.AfterMutation = make([]string, 0)
+	}
+
+	if config.BeforeMutation == nil {
+		config.BeforeMutation = make([]string, 0)
+	}
+
 	return config, nil
 }

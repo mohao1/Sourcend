@@ -1,7 +1,6 @@
 package store_event
 
 import (
-	"Sourcend/action"
 	"context"
 	"crypto/tls"
 	"github.com/redis/go-redis/v9"
@@ -39,6 +38,7 @@ func NewRedisStore(config RedisStoreConfig) *RedisStore {
 }
 
 func (r *RedisStore) Handler(ctx context.Context, data StoreEventInfo) error {
-	action.NewAction()
-	r.redisClient.HSet()
+	//action.NewAction()
+	//r.redisClient.HSet()
+	return nil
 }

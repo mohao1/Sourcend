@@ -39,8 +39,8 @@ func TestSourcendServer(t *testing.T) {
 	}
 
 	info := server.SourcendInfo{
-		CommandID:  "command-1",
-		MutationID: "mutation-2",
+		CommandID:  "command-11",
+		MutationID: "mutation-1",
 		Event:      "测试数据",
 		Params:     map[string]string{},
 	}

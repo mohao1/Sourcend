@@ -111,6 +111,8 @@ func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServe
 		for _, store := range storeEventList {
 			switch store {
 			case store_event.MySQL:
+				sqlStore := store_event.NewMySQLStore()
+				storeEvents = append(storeEvents, sqlStore)
 			case store_event.Redis:
 			default:
 				fmt.Println("store does not match")

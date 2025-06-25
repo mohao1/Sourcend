@@ -10,6 +10,6 @@ type StoreEventInfo struct {
 type StoreEventType string
 
 const (
-	MySQL = "MySQL"
-	Redis = "REDIS"
+	MySQL = "mysql"
+	Redis = "redis"
 )

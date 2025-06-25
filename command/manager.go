@@ -81,7 +81,11 @@ func (m *Manager) Register(commandID string, handler HandlerInterface, middlewar
 
 func (m *Manager) executeCommand(ctx context.Context, data common.CommandInfo) (*common.CommandInfo, error) {
 	commandID := data.CommandID
-	commandHandler := m.handlerManager[commandID]
+	commandHandler, ok := m.handlerManager[commandID]
+
+	if !ok {
+		return nil, errors.New("command handler not found: " + commandID)
+	}
 
 	// 转换数据 Info=>Data
 	config := m.ManagerConfig.CommandConfigMap[commandID]

@@ -13,3 +13,11 @@ const (
 	MySQL = "mysql"
 	Redis = "redis"
 )
+
+type MySQLConfig struct {
+	ActionTable  string // Action存储表名
+	IsActionKey  bool   // 是否开启Key的配置模式
+	ActionKey    string // Action的Key
+	ActionMaxLen int64  // Action内的最大长度
+	DSN          string // 连接的数据库配置
+}

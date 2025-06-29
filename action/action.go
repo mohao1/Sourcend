@@ -6,14 +6,16 @@ import (
 
 // Action action的根数据 - 保存数据结构
 type Action struct {
+	actionName   string  // Action的名称
 	rootData     string  // 初始化的数据 - json数据
 	startEventID int64   // 起始版本ID
 	events       []Event // 指令版本记录 DATA:Event数据
 	eventLen     int64   // 记录长度
 }
 
-func NewAction(rootData string, startEventID int64) *Action {
+func NewAction(actionName string, rootData string, startEventID int64) *Action {
 	return &Action{
+		actionName:   actionName,
 		rootData:     rootData,
 		startEventID: startEventID,
 		events:       make([]Event, 0),

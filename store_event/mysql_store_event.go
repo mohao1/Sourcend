@@ -62,14 +62,17 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 
 	isKey := m.config.IsActionKey
 	if isKey && m.config.ActionKey != "" {
-		actionKey := data.Params[m.config.ActionKey]
+		actionKey, ok := data.Params[m.config.ActionKey]
+		if !ok {
+			return errors.New("action key not found")
+		}
 		actionData := MySQLAction{}
 		// 通过长度计算
-		err := dbTable.Where("action_name = ?", actionKey).Order("start_event_id DESC").First(&actionData).Error
+		err := dbTable.Where("action_name LIKE ?", actionKey+"-%").Order("start_event_id DESC").First(&actionData).Error
 		if err != nil {
 			if !errors.Is(err, gorm.ErrRecordNotFound) {
 				actionData = MySQLAction{
-					ActionName:   actionKey,
+					ActionName:   actionKey + "-0",
 					RootData:     m.rooInitData,
 					StartEventID: 0,
 					Events:       []MySQLEvent{},
@@ -83,13 +86,14 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 
 		if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
 			// 获取新的rootData
-			// 进行回放
+			// TODO 进行回放
 			rootData := ""
+			StartEventID := actionData.StartEventID + actionData.EventLen
 			// 进行新的数据组装
 			actionData = MySQLAction{
-				ActionName:   actionKey,
+				ActionName:   fmt.Sprintf("%s-%v", actionKey, StartEventID),
 				RootData:     rootData,
-				StartEventID: actionData.StartEventID + actionData.EventLen,
+				StartEventID: StartEventID,
 				Events:       []MySQLEvent{},
 				EventLen:     0,
 			}
@@ -108,16 +112,49 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 
 	} else {
 		// 使用最小版本号来进行作为主键存储
-		actionKey := "0"
-	}
+		actionData := MySQLAction{}
+		err := dbTable.Order("action_name DESC").First(&actionData).Error
+		if err != nil {
+			if !errors.Is(err, gorm.ErrRecordNotFound) {
+				actionData = MySQLAction{
+					ActionName:   "0",
+					RootData:     m.rooInitData,
+					StartEventID: 0,
+					Events:       []MySQLEvent{},
+					EventLen:     0,
+				}
+			} else {
+				fmt.Println("first action err:", err)
+				return err
+			}
+		}
 
-	//sqlAction := MySQLAction{
-	//	ActionName:   "",
-	//	RootData:     "",
-	//	StartEventID: 0,
-	//	Events:       nil,
-	//	EventLen:     0,
-	//}
+		if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
+			// 获取新的rootData
+			// TODO 进行回放
+			rootData := ""
+			StartEventID := actionData.StartEventID + actionData.EventLen
+			// 进行新的数据组装
+			actionData = MySQLAction{
+				ActionName:   fmt.Sprintf("%v", StartEventID),
+				RootData:     rootData,
+				StartEventID: StartEventID,
+				Events:       []MySQLEvent{},
+				EventLen:     0,
+			}
+		}
+
+		actionData.EventLen++
+		actionData.Events = append(actionData.Events, MySQLEvent{
+			CommandID:  data.CommandID,
+			MutationID: data.MutationID,
+			Event:      data.Event,
+			Params:     data.Params,
+		})
+
+		// 存储
+		dbTable.Save(actionData)
+	}
 
 	return nil
 }

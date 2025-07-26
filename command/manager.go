@@ -138,6 +138,8 @@ func (m *Manager) Execute(ctx context.Context, info common.CommandInfo, storeEve
 	return nil
 }
 
+// TODO 需要实现回放函数
+
 func (m *Manager) beforeMutation(ctx context.Context, info common.CommandInfo, managers []*mutation.Manager) error {
 	data := common.MutationInfo{
 		MutationID: info.MutationID,

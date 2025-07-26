@@ -20,7 +20,7 @@ type SourcendServer struct {
 }
 
 // NewDefaultSourcend 根据配置文件生成SourcendServer
-func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServer, error) {
+func NewDefaultSourcend(mutationYamlDir, commandYamlPath string, rootInitData string) (*SourcendServer, error) {
 	// 解析Yaml
 	after, before, err := mutationConfigYamlDir(mutationYamlDir)
 	if err != nil {
@@ -111,7 +111,14 @@ func NewDefaultSourcend(mutationYamlDir, commandYamlPath string) (*SourcendServe
 		for _, store := range storeEventList {
 			switch store {
 			case store_event.MySQL:
-				sqlStore := store_event.NewMySQLStore()
+				mysqlConfig := store_event.MySQLConfig{
+					ActionTable:  commandConfig.MySQLConfig.ActionTable,
+					IsActionKey:  commandConfig.MySQLConfig.IsActionKey,
+					ActionKey:    commandConfig.MySQLConfig.ActionKey,
+					ActionMaxLen: commandConfig.MySQLConfig.ActionMaxLen,
+					DSN:          commandConfig.MySQLConfig.DSN,
+				}
+				sqlStore := store_event.NewMySQLStore(mysqlConfig, rootInitData)
 				storeEvents = append(storeEvents, sqlStore)
 			case store_event.Redis:
 			default:

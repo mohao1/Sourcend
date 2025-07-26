@@ -1,7 +1,7 @@
 package store_event
 
 import (
-	"Sourcend/action"
+	"Sourcend/server"
 	"context"
 	"errors"
 	"fmt"
@@ -48,7 +48,7 @@ func NewMySQLStore(config MySQLConfig, rooInitData string) *MySQLStore {
 
 	// 创建数据
 	// 设置表名 - 更新创建数据库的结构
-	err = db.Table(config.ActionTable).AutoMigrate(&action.Action{})
+	err = db.Table(config.ActionTable).AutoMigrate(&MySQLAction{})
 	if err != nil {
 		fmt.Println("gorm migrate err:", err)
 		return nil
@@ -82,20 +82,20 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 				fmt.Println("first action err:", err)
 				return err
 			}
-		}
-
-		if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
-			// 获取新的rootData
-			// TODO 进行回放
-			rootData := ""
-			StartEventID := actionData.StartEventID + actionData.EventLen
-			// 进行新的数据组装
-			actionData = MySQLAction{
-				ActionName:   fmt.Sprintf("%s-%v", actionKey, StartEventID),
-				RootData:     rootData,
-				StartEventID: StartEventID,
-				Events:       []MySQLEvent{},
-				EventLen:     0,
+		} else {
+			if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
+				// 获取新的rootData
+				// TODO 进行回放
+				rootData := ""
+				StartEventID := actionData.StartEventID + actionData.EventLen
+				// 进行新的数据组装
+				actionData = MySQLAction{
+					ActionName:   fmt.Sprintf("%s-%v", actionKey, StartEventID),
+					RootData:     rootData,
+					StartEventID: StartEventID,
+					Events:       []MySQLEvent{},
+					EventLen:     0,
+				}
 			}
 		}
 
@@ -127,20 +127,20 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 				fmt.Println("first action err:", err)
 				return err
 			}
-		}
-
-		if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
-			// 获取新的rootData
-			// TODO 进行回放
-			rootData := ""
-			StartEventID := actionData.StartEventID + actionData.EventLen
-			// 进行新的数据组装
-			actionData = MySQLAction{
-				ActionName:   fmt.Sprintf("%v", StartEventID),
-				RootData:     rootData,
-				StartEventID: StartEventID,
-				Events:       []MySQLEvent{},
-				EventLen:     0,
+		} else {
+			if actionData.StartEventID+actionData.EventLen >= m.config.ActionMaxLen {
+				// 获取新的rootData
+				// TODO 进行回放
+				rootData := ""
+				StartEventID := actionData.StartEventID + actionData.EventLen
+				// 进行新的数据组装
+				actionData = MySQLAction{
+					ActionName:   fmt.Sprintf("%v", StartEventID),
+					RootData:     rootData,
+					StartEventID: StartEventID,
+					Events:       []MySQLEvent{},
+					EventLen:     0,
+				}
 			}
 		}
 
@@ -157,4 +157,8 @@ func (m *MySQLStore) Handler(ctx context.Context, data StoreEventInfo) error {
 	}
 
 	return nil
+}
+
+func MySQLPlayback(ctx context.Context, action MySQLAction, server server.SourcendServer) error {
+
 }

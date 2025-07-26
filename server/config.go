@@ -1,6 +1,7 @@
 package server
 
 import (
+	"Sourcend/store_event"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
@@ -14,11 +15,12 @@ import (
 
 // CommandConfig Command配置解析结构
 type CommandConfig struct {
-	CommandName           string                 `yaml:"CommandName"`           // Command名称
-	AfterMutation         []string               `yaml:"AfterMutation"`         // Mutation顺序
-	BeforeMutation        []string               `yaml:"BeforeMutation"`        // Mutation顺序
-	StoreEvents           []string               `yaml:"StoreEvents"`           // StoreEvents列表
-	CommandHandlerConfigs []CommandHandlerConfig `yaml:"CommandHandlerConfigs"` // CommandHandler配置文件
+	CommandName           string                  `yaml:"CommandName"`           // Command名称
+	AfterMutation         []string                `yaml:"AfterMutation"`         // Mutation顺序
+	BeforeMutation        []string                `yaml:"BeforeMutation"`        // Mutation顺序
+	StoreEvents           []string                `yaml:"StoreEvents"`           // StoreEvents列表
+	MySQLConfig           store_event.MySQLConfig `yaml:"MysqlConfig"`           // StoreEventMySQL的配置文件
+	CommandHandlerConfigs []CommandHandlerConfig  `yaml:"CommandHandlerConfigs"` // CommandHandler配置文件
 }
 
 // CommandHandlerConfig CommandHandler配置文件
